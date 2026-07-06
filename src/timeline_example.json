@@ -1,0 +1,45 @@
+{
+  "project_title": "Bí mật của Mèo Cam (Full AI Dynamic)",
+  "voice_code": "vi-VN-HoaiMyNeural",
+  "visual_style": "cinematic painting, high detail, masterpiece",
+  "background_music": "src/mock_assets/music.wav",
+  "music_volume": 0.06,
+  "scenes": [
+    {
+      "scene_id": "scene_1",
+      "voice_text": "Chào các bạn! Bạn có biết điều gì khiến loài mèo cam trở nên vô cùng đặc biệt không?",
+      "visual_prompt": "A majestic orange tabby cat looking directly into the camera, warm soft lighting",
+      "effect": {
+        "type": "zoom_in",
+        "speed": 0.001
+      }
+    },
+    {
+      "scene_id": "scene_2",
+      "voice_text": "Vào thời cổ đại, mèo cam từng được người Ai Cập tôn kính như một biểu tượng của sự may mắn.",
+      "visual_prompt": "An ancient Egyptian temple with hieroglyphs, a sacred orange cat statue, warm sunset glow",
+      "effect": {
+        "type": "zoom_out",
+        "speed": 0.001
+      }
+    },
+    {
+      "scene_id": "scene_3",
+      "voice_text": "Chúng nổi tiếng vì sự nghịch ngợm, ham ăn, và tính cách vô cùng hài hước.",
+      "visual_prompt": "A funny chubby orange cat trying to grab food from a table, messy kitchen, humorous scene",
+      "effect": {
+        "type": "zoom_in",
+        "speed": 0.0015
+      }
+    },
+    {
+      "scene_id": "scene_4",
+      "voice_text": "Hãy nhấn đăng ký kênh để không bỏ lỡ những video thú vị tiếp theo nhé!",
+      "visual_prompt": "A friendly orange cat waving its paw next to a large red subscribe button, digital art style",
+      "effect": {
+        "type": "zoom_out",
+        "speed": 0.0012
+      }
+    }
+  ]
+}
