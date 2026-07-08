@@ -10,14 +10,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-            --panel-bg: rgba(30, 41, 59, 0.45);
-            --border-color: rgba(255, 255, 255, 0.08);
-            --primary-glow: #6366f1;
-            --primary-hover: #4f46e5;
-            --accent-color: #a855f7;
-            --text-color: #f8fafc;
-            --text-muted: #94a3b8;
+            --bg-main: #0a0b0d;            /* Pure dark slate black */
+            --panel-bg: rgba(18, 19, 21, 0.95); /* Neutral charcoal grey */
+            --border-color: #2a2c31;       /* Cool clean grey */
+            --border-hover: #3a3d45;       /* Steel grey */
+            --primary-glow: #00f2fe;      /* Neon Cyan */
+            --primary-hover: #0ea5e9;     /* Deep Cyan-Blue */
+            --accent-color: #14b8a6;      /* Tech Teal */
+            --text-color: #e6edf3;
+            --text-muted: #8b949e;
+            
+            --bg-input: #0d0e11;          /* Dark charcoal */
+            --accent-green: #00ffd0;
+            --accent-emerald: #10b981;
+            --accent-red: #f43f5e;
+            --accent-amber: #eab308;
+            --font-sans: 'Inter', -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
         }
 
         * {
@@ -26,9 +35,26 @@
             padding: 0;
         }
 
+        /* Custom Scrollbar for IDE Theme */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-main);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--border-hover);
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-gradient);
+            font-family: var(--font-sans);
+            background: radial-gradient(circle, rgba(0, 242, 254, 0.02) 1px, transparent 1px) var(--bg-main);
+            background-size: 24px 24px;
             color: var(--text-color);
             min-height: 100vh;
             display: flex;
@@ -39,29 +65,163 @@
             overflow-x: hidden;
         }
 
-        header {
-            text-align: center;
-            margin-bottom: 45px;
+        /* IDE Window Shell */
+        .ide-window {
+            width: 100%;
+            max-width: 1200px;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: visible;
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
         }
 
-        h1 {
-            font-size: 2.8rem;
+        .ide-titlebar {
+            background: #121316;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            border-bottom: 1px solid var(--border-color);
+            border-top-left-radius: 11px;
+            border-top-right-radius: 11px;
+            user-select: none;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .ide-win-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .control-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .control-dot.close { background: #ff5f56; }
+        .control-dot.minimize { background: #ffbd2e; }
+        .control-dot.maximize { background: #27c93f; }
+
+        .ide-title-text {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            letter-spacing: 0.02em;
+        }
+
+        .ide-status-indicators {
+            display: flex;
+            align-items: center;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        .status-indicator-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-pulse-green {
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-emerald);
+            border-radius: 50%;
+            box-shadow: 0 0 6px var(--accent-emerald);
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; box-shadow: 0 0 10px var(--accent-emerald); }
+            100% { opacity: 0.4; }
+        }
+
+        .ide-toolbar {
+            background: #181a1f;
+            height: 34px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            user-select: none;
+            position: sticky;
+            top: 38px;
+            z-index: 100;
+        }
+
+        .toolbar-menu {
+            display: flex;
+            gap: 16px;
+        }
+
+        .menu-item {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-family: var(--font-sans);
+            transition: color 0.2s ease;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            color: var(--text-color);
+        }
+        .menu-item.active {
+            font-weight: 500;
+            border-bottom: 1px solid var(--primary-glow);
+            padding-bottom: 4px;
+            margin-bottom: -4px;
+        }
+
+        .action-tag {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            background: rgba(0, 242, 254, 0.08);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            color: var(--primary-glow);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .ide-content-area {
+            padding: 30px;
+        }
+
+        .ide-inner-header {
+            margin-bottom: 35px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        .ide-inner-header h1 {
+            font-family: var(--font-sans);
             font-weight: 700;
-            letter-spacing: -0.05em;
-            background: linear-gradient(to right, #818cf8, #c084fc);
+            font-size: 2.2rem;
+            letter-spacing: -0.04em;
+            background: linear-gradient(to right, var(--primary-glow), var(--accent-color));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 8px;
         }
 
         p.subtitle {
-            font-size: 1.1rem;
+            font-size: 0.98rem;
             color: var(--text-muted);
-            font-weight: 300;
+            font-weight: 400;
         }
 
         .container {
-            max-width: 1100px;
             width: 100%;
             display: grid;
             grid-template-columns: 1.1fr 1fr;
@@ -74,22 +234,101 @@
             }
         }
 
-        /* Hiệu ứng Glassmorphism cho Panel */
         .panel {
             background: var(--panel-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: all 0.25s ease;
             margin-bottom: 30px;
+            position: relative;
         }
 
         .panel:hover {
-            border-color: rgba(99, 102, 241, 0.2);
-            box-shadow: 0 20px 50px rgba(99, 102, 241, 0.1);
+            border-color: rgba(0, 242, 254, 0.25);
+            box-shadow: 0 10px 40px rgba(0, 242, 254, 0.05);
+        }
+
+        /* Sticky panel for layout constraint */
+        .sticky-right-panel {
+            position: sticky;
+            top: 102px;
+            align-self: start;
+            height: calc(100vh - 182px);
+            min-height: 520px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pane-content-wrapper {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        /* Tech header line decoration */
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 20px;
+            width: 40px;
+            height: 2px;
+            background: var(--primary-glow);
+            box-shadow: 0 0 8px var(--primary-glow);
+            border-radius: 2px;
+            opacity: 0.7;
+        }
+
+        /* Pane tabs styling for IDE file feel */
+        .pane-tabs-container {
+            display: flex;
+            background: #121316;
+            border-bottom: 1px solid var(--border-color);
+            user-select: none;
+            height: 35px;
+        }
+
+        .pane-tab {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 16px;
+            border-right: 1px solid var(--border-color);
+            background: #121316;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            cursor: pointer;
+            height: 100%;
+            transition: all 0.15s ease;
+        }
+
+        .pane-tab.active {
+            background: var(--panel-bg);
+            color: var(--text-color);
+            border-top: 2px solid var(--primary-glow);
+            margin-top: -1px;
+            height: calc(100% + 1px);
+        }
+
+        .pane-tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-color);
+        }
+
+        .tab-icon {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .pane-tab.active .tab-icon {
+            color: var(--primary-glow);
         }
 
         .form-group {
@@ -98,68 +337,87 @@
 
         label {
             display: block;
-            font-size: 0.85rem;
+            font-size: 0.78rem;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.08em;
             color: var(--text-muted);
             margin-bottom: 8px;
+            font-family: var(--font-mono);
         }
 
-        input[type="text"], input[type="password"], textarea {
+        input[type="text"], input[type="password"], textarea, select {
             width: 100%;
             padding: 12px 16px;
-            background: rgba(15, 23, 42, 0.6);
+            background: var(--bg-input);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
+            border-radius: 6px;
             color: var(--text-color);
-            font-size: 0.95rem;
-            font-family: inherit;
+            font-size: 0.92rem;
+            font-family: var(--font-mono);
             transition: all 0.2s ease;
         }
 
-        input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
+        input[type="text"]:focus, input[type="password"]:focus, textarea:focus, select:focus {
             outline: none;
             border-color: var(--primary-glow);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-            background: rgba(15, 23, 42, 0.8);
+            box-shadow: 0 0 0 2px rgba(0, 242, 254, 0.15);
+            background: rgba(0, 0, 0, 0.7);
         }
 
-        /* Nút phát sáng động */
+        /* Submit Button with Outline Glow hover */
         .btn-submit {
             display: block;
             width: 100%;
-            padding: 16px;
-            background: linear-gradient(90deg, var(--primary-glow) 0%, var(--accent-color) 100%);
-            border: none;
-            border-radius: 12px;
-            color: white;
-            font-size: 1.05rem;
-            font-weight: 600;
+            padding: 14px;
+            background: var(--primary-glow);
+            border: 1px solid var(--primary-glow);
+            border-radius: 6px;
+            color: #0b0e14;
+            font-size: 0.95rem;
+            font-family: var(--font-mono);
+            font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.25);
-            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 242, 254, 0.15);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
 
         .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.45);
+            background: transparent;
+            color: var(--primary-glow);
+            box-shadow: 0 4px 20px rgba(0, 242, 254, 0.3);
+            text-shadow: 0 0 8px rgba(0, 242, 254, 0.5);
         }
 
         .btn-submit:active {
-            transform: translateY(0);
+            transform: translateY(1px);
         }
 
         .btn-submit:disabled {
-            background: #475569;
+            background: #1f2937;
+            border-color: #1f2937;
+            color: var(--text-muted);
             cursor: not-allowed;
             box-shadow: none;
             transform: none;
         }
 
-        /* Khung gợi ý ý tưởng (Săn ý tưởng) */
+        .btn-submit.btn-teal {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.15);
+        }
+
+        .btn-submit.btn-teal:hover {
+            background: transparent;
+            color: var(--accent-color);
+            box-shadow: 0 4px 20px rgba(20, 184, 166, 0.3);
+            text-shadow: 0 0 8px rgba(20, 184, 166, 0.5);
+        }
+
+        /* Idea card design */
         .idea-list {
             margin-top: 15px;
             display: flex;
@@ -168,27 +426,28 @@
         }
 
         .idea-card {
-            background: rgba(15, 23, 42, 0.4);
+            background: rgba(7, 9, 13, 0.5);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
+            border-radius: 6px;
             padding: 12px 16px;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
             transition: all 0.2s ease;
+            position: relative;
         }
 
         .idea-card:hover {
-            background: rgba(99, 102, 241, 0.1);
-            border-color: rgba(99, 102, 241, 0.3);
+            background: rgba(0, 242, 254, 0.05);
+            border-color: rgba(0, 242, 254, 0.3);
             transform: translateX(4px);
         }
 
         .idea-card.active {
-            background: rgba(99, 102, 241, 0.2);
+            background: rgba(0, 242, 254, 0.08);
             border-color: var(--primary-glow);
-            box-shadow: 0 0 15px rgba(99, 102, 241, 0.25);
+            box-shadow: inset 3px 0 0 var(--primary-glow), 0 0 15px rgba(0, 242, 254, 0.1);
             transform: translateX(4px);
         }
 
@@ -208,25 +467,27 @@
         .idea-meta {
             font-size: 0.75rem;
             color: var(--text-muted);
+            font-family: var(--font-mono);
         }
 
         .virality-badge {
             padding: 4px 8px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            background: rgba(168, 85, 247, 0.2);
-            color: #d8b4fe;
-            border: 1px solid rgba(168, 85, 247, 0.4);
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 500;
+            background: rgba(20, 184, 166, 0.1);
+            color: #2dd4bf;
+            border: 1px solid rgba(20, 184, 166, 0.3);
         }
 
         .virality-high {
-            background: rgba(34, 197, 94, 0.2);
-            color: #86efac;
-            border: 1px solid rgba(34, 197, 94, 0.4);
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
         }
 
-        /* Trạng thái sinh video */
+        /* Loading & video styles */
         .status-container {
             display: none;
             flex-direction: column;
@@ -239,7 +500,7 @@
         .spinner {
             width: 50px;
             height: 50px;
-            border: 4px solid rgba(255, 255, 255, 0.1);
+            border: 4px solid rgba(0, 242, 254, 0.1);
             border-top-color: var(--primary-glow);
             border-radius: 50%;
             animation: spin 1s linear infinite;
@@ -250,7 +511,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Trình phát video & Điều khiển nâng cao */
         .video-container {
             display: none;
             flex-direction: column;
@@ -259,9 +519,9 @@
 
         video {
             width: 100%;
-            border-radius: 12px;
+            border-radius: 6px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
             margin-bottom: 15px;
             aspect-ratio: 16/9;
             background: black;
@@ -271,36 +531,43 @@
             display: inline-block;
             text-align: center;
             padding: 12px 20px;
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-color);
+            border-radius: 6px;
+            color: var(--text-muted);
             text-decoration: none;
             font-size: 0.9rem;
+            font-family: var(--font-mono);
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
         }
 
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(0, 242, 254, 0.05);
+            border-color: var(--primary-glow);
+            color: var(--text-color);
         }
 
         .btn-action-main {
             background: var(--primary-glow);
             border-color: var(--primary-glow);
+            color: #0b0e14;
+            font-weight: 600;
         }
+        
         .btn-action-main:hover {
-            background: var(--primary-hover);
+            background: transparent;
+            color: var(--primary-glow);
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.2);
         }
 
-        /* Khung xuất bản và Checkbox */
         .publish-box {
             margin-top: 20px;
             padding: 20px;
-            background: rgba(15, 23, 42, 0.4);
+            background: rgba(7, 9, 13, 0.4);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
+            border-radius: 6px;
             width: 100%;
         }
 
@@ -317,6 +584,7 @@
             gap: 8px;
             font-size: 0.9rem;
             cursor: pointer;
+            color: var(--text-secondary);
         }
 
         .checkbox-container input {
@@ -326,10 +594,10 @@
 
         .publish-logs {
             margin-top: 15px;
-            background: #020617;
+            background: #0d0e11;
             padding: 10px 15px;
-            border-radius: 8px;
-            font-family: 'JetBrains Mono', monospace;
+            border-radius: 6px;
+            font-family: var(--font-mono);
             font-size: 0.8rem;
             color: #22c55e;
             max-height: 120px;
@@ -338,7 +606,6 @@
             display: none;
         }
 
-        /* Log Terminal PostgreSQL */
         .db-report-panel {
             grid-column: 1 / span 2;
             width: 100%;
@@ -355,9 +622,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #0f172a;
-            padding: 10px 20px;
-            border-radius: 12px 12px 0 0;
+            background: #121316;
+            padding: 10px 16px;
+            border-radius: 8px 8px 0 0;
             border: 1px solid var(--border-color);
             border-bottom: none;
         }
@@ -377,22 +644,24 @@
         .dot-green { background: #22c55e; }
 
         .terminal-title {
-            font-family: 'JetBrains Mono', monospace;
+            font-family: var(--font-mono);
             font-size: 0.8rem;
             color: var(--text-muted);
         }
 
         pre {
-            background: #020617;
+            background: #0d0e11;
             padding: 20px;
-            border-radius: 0 0 12px 12px;
+            border-radius: 0 0 8px 8px;
             border: 1px solid var(--border-color);
             color: #38bdf8;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
             overflow-x: auto;
             max-height: 400px;
             white-space: pre-wrap;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+            line-height: 1.5;
         }
 
         .btn-refresh {
@@ -412,152 +681,217 @@
 </head>
 <body>
 
-    <header>
-        <h1>AI Content Factory</h1>
-        <p class="subtitle">Hệ điều hành sản xuất video tự động cục bộ (7 Systems Full Spec)</p>
-    </header>
-
-    <div class="container">
-        <!-- Cột Trái: Quét ý tưởng + Form điều khiển -->
-        <div style="display: flex; flex-direction: column; gap: 30px;">
-            
-            <!-- SYSTEM 1: SĂN Ý TƯỞNG CẠNH TRANH -->
-            <div class="panel">
-                <label>System 1 — Săn Ý Tưởng Hot Của Đối Thủ</label>
-                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                    <input type="text" id="scraper-keyword" value="Bí ẩn lịch sử khoa học" placeholder="Nhập từ khóa quét...">
-                    <button type="button" class="btn-secondary" id="btn-scrape-ideas" style="white-space: nowrap; padding: 12px 16px;">Săn Ý Tưởng</button>
-                </div>
-                <div class="idea-list" id="ideas-container">
-                    <p style="color: var(--text-muted); font-size: 0.85rem; text-align: center;">Bấm nút để quét các ý tưởng có tỉ lệ viral cao nhất...</p>
-                </div>
+    <!-- IDE Shell container wrapper -->
+    <div class="ide-window">
+        <!-- Mock Titlebar -->
+        <div class="ide-titlebar">
+            <div class="ide-win-controls">
+                <span class="control-dot close"></span>
+                <span class="control-dot minimize"></span>
+                <span class="control-dot maximize"></span>
             </div>
-
-            <!-- Bảng cấu hình & Nhập liệu -->
-            <div class="panel">
-                <label>Cấu hình & Tạo Kịch Bản</label>
-                <form id="generator-form">
-                    <div class="form-group">
-                        <label for="ai_provider">AI Provider (Nhà cung cấp)</label>
-                        <select id="ai_provider" style="width: 100%; padding: 12px 16px; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-color); font-size: 0.95rem; font-family: inherit; outline: none; transition: all 0.2s ease;">
-                            <option value="gemini">Google Gemini (Gemini 1.5 Flash)</option>
-                            <option value="openai">OpenAI (GPT-4o-mini)</option>
-                            <option value="claude">Anthropic Claude (Claude 3.5 Sonnet)</option>
-                            <option value="local">Local (Ollama Cục Bộ)</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="openai_key" id="api_key_label">API Key</label>
-                        <input type="password" id="openai_key" placeholder="AIzaSy..." required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="db_url">PostgreSQL DB URL</label>
-                        <input type="text" id="db_url" value="postgresql://postgres:postgres@localhost:5432/postgres">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="sd_url">Stable Diffusion API (GPU)</label>
-                        <input type="text" id="sd_url" value="http://localhost:7860">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="topic">Chủ đề Video (Topic)</label>
-                        <textarea id="topic" rows="3" placeholder="Ví dụ: Bí ẩn kỳ lạ về Tam giác quỷ Bermuda..." required></textarea>
-                    </div>
-                    
-                    <button type="submit" class="btn-submit" id="btn-submit">1. SÁNG TÁC KỊCH BẢN</button>
-                </form>
-            </div>
-        </div>
-
-        <!-- Cột Phải: Xem thử kịch bản, biên tập + Dựng video + Xuất bản -->
-        <div class="panel" style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center; min-height: 450px;">
-            <!-- Trạng thái chờ -->
-            <div id="status-waiting" style="text-align: center; color: var(--text-muted); margin-top: 60px;">
-                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 15px; opacity: 0.5;">
-                    <path d="M12 6V12L16 14M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke-linecap="round" stroke-linejoin="round"/>
+            <div class="ide-title-text">
+                <svg class="git-branch-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px; opacity: 0.7;">
+                    <line x1="6" y1="3" x2="6" y2="15"></line>
+                    <circle cx="18" cy="6" r="3"></circle>
+                    <circle cx="6" cy="18" r="3"></circle>
+                    <path d="M18 9a9 9 0 0 1-9 9"></path>
                 </svg>
-                <p>Chọn ý tưởng bên trái hoặc nhập chủ đề để dựng video</p>
+                content-creator-workspace [Antigravity IDE] - index.html
             </div>
-
-            <!-- Loader và Logs -->
-            <div id="status-loading" class="status-container">
-                <div class="spinner"></div>
-                <h3 style="margin-bottom: 8px;" id="loading-header">Đang sản xuất video...</h3>
-                <p id="loading-step" style="color: var(--text-muted); font-size: 0.9rem;">Đang kết nối database...</p>
-            </div>
-
-            <!-- BƯỚC 1.5: BIÊN TẬP KỊCH BẢN (JSON EDITOR) -->
-            <div id="editor-wrapper" style="display: none; flex-direction: column; width: 100%; height: 100%;">
-                <h3 style="margin-bottom: 8px; background: linear-gradient(to right, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">✎ Biên Tập Kịch Bản (JSON)</h3>
-                <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 12px; line-height: 1.4;">Bạn có thể chỉnh sửa câu thuyết minh (voice_text) hoặc mô tả ảnh (visual_prompt) trực tiếp dưới đây trước khi bấm Dựng video.</p>
-                <div class="form-group" style="width: 100%;">
-                    <textarea id="timeline-editor" style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; line-height: 1.4; color: #38bdf8; height: 320px; background: #020617; resize: vertical;" rows="15"></textarea>
-                </div>
-                <button type="button" class="btn-submit" id="btn-render" style="margin-top: 10px; background: linear-gradient(90deg, #10b981 0%, #059669 100%); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.25);">
-                    2. BẮT ĐẦU DỰNG VIDEO
-                </button>
-            </div>
-
-            <!-- Video Player & Phản hồi viết lại (A/B Feedback) & Publish -->
-            <div id="video-wrapper" class="video-container">
-                <h3 style="margin-bottom: 12px; background: linear-gradient(to right, #34d399, #059669); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">✓ Đã Dựng Thành Phẩm!</h3>
-                <video id="video-player" controls>
-                    <source src="" type="video/mp4">
-                </video>
-                
-                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                    <a href="" id="download-link" class="btn-secondary btn-action-main" download>Tải Video Về Máy</a>
-                </div>
-
-                <!-- SYSTEM 7: ĐIỀU CHỈNH KỊCH BẢN (REGENERATE FEEDBACK) -->
-                <div class="form-group" style="width: 100%; border-top: 1px solid var(--border-color); padding-top: 15px;">
-                    <label>Yêu cầu sửa đổi (Viết lại kịch bản & Sinh lại ảnh)</label>
-                    <textarea id="feedback-text" rows="2" placeholder="Ví dụ: 'Tôi không muốn nhân vật chính là nam, tôi muốn hình ảnh chân thật và nhiều cảnh hành động hơn'"></textarea>
-                    <button type="button" class="btn-secondary" id="btn-regenerate" style="width: 100%; margin-top: 10px; border-color: var(--accent-color); color: #d8b4fe;">
-                        Tạo Lại Bản Video Mới
-                    </button>
-                </div>
-
-                <!-- SYSTEM 6: XUẤT BẢN ĐA NỀN TẢNG (PUBLISH SIMULATOR) -->
-                <div class="publish-box">
-                    <label>System 6 — Cấu hình & Xuất bản đa nền tảng</label>
-                    <div class="platforms-list">
-                        <label class="checkbox-container">
-                            <input type="checkbox" name="platform" value="youtube" checked> YouTube
-                        </label>
-                        <label class="checkbox-container">
-                            <input type="checkbox" name="platform" value="facebook" checked> Facebook
-                        </label>
-                        <label class="checkbox-container">
-                            <input type="checkbox" name="platform" value="ganjing_world" checked> Ganjing World
-                        </label>
-                        <label class="checkbox-container">
-                            <input type="checkbox" name="platform" value="tiktok" checked> TikTok
-                        </label>
-                    </div>
-                    <button type="button" class="btn-submit" id="btn-publish" style="padding: 12px; font-size: 0.9rem;">
-                        Xuất Bản Video
-                    </button>
-                    <div class="publish-logs" id="publish-logs-panel"></div>
-                </div>
+            <div class="ide-status-indicators">
+                <span class="status-indicator-item">
+                    <span class="status-pulse-green"></span> PostgreSQL: ACTIVE
+                </span>
             </div>
         </div>
 
-        <!-- Panel 3: Terminal PostgreSQL Báo Cáo SQL -->
-        <div class="panel db-report-panel">
-            <div class="terminal-header">
-                <div class="terminal-dots">
-                    <div class="dot dot-red"></div>
-                    <div class="dot dot-yellow"></div>
-                    <div class="dot dot-green"></div>
-                </div>
-                <div class="terminal-title">POSTGRESQL & GRAPH DATABASE REPORT</div>
-                <button class="btn-refresh" id="btn-refresh-db">Refresh DB Report</button>
+        <!-- Mock Toolbar -->
+        <div class="ide-toolbar">
+            <div class="toolbar-menu">
+                <span class="menu-item active" id="menu-console">Console</span>
+                <span class="menu-item">File</span>
+                <span class="menu-item">Edit</span>
+                <span class="menu-item">Run</span>
+                <span class="menu-item" id="menu-db-report">Database</span>
+                <span class="menu-item">Help</span>
             </div>
-            <pre id="db-output">Loading database summary logs...</pre>
+            <div class="toolbar-actions">
+                <span class="action-tag">v1.2.0-stable</span>
+            </div>
+        </div>
+
+        <!-- Main workspace inside the IDE window -->
+        <div class="ide-content-area">
+            <header class="ide-inner-header">
+                <h1>AI Content Factory</h1>
+                <p class="subtitle">Hệ điều hành sản xuất video tự động cục bộ (7 Systems Full Spec)</p>
+            </header>
+
+            <div class="container">
+                <!-- Cột Trái: Quét ý tưởng + Form điều khiển -->
+                <div style="display: flex; flex-direction: column; gap: 30px;">
+                    
+                    <!-- SYSTEM 1: SĂN Ý TƯỞNG CẠNH TRANH -->
+                    <div class="panel">
+                        <label>System 1 — Săn Ý Tưởng Hot Của Đối Thủ</label>
+                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                            <input type="text" id="scraper-keyword" value="Bí ẩn lịch sử khoa học" placeholder="Nhập từ khóa quét...">
+                            <button type="button" class="btn-secondary" id="btn-scrape-ideas" style="white-space: nowrap; padding: 12px 16px;">Săn Ý Tưởng</button>
+                        </div>
+                        <div class="idea-list" id="ideas-container">
+                            <p style="color: var(--text-muted); font-size: 0.85rem; text-align: center;">Bấm nút để quét các ý tưởng có tỉ lệ viral cao nhất...</p>
+                        </div>
+                    </div>
+
+                    <!-- Bảng cấu hình & Nhập liệu -->
+                    <div class="panel">
+                        <label>Cấu hình & Tạo Kịch Bản</label>
+                        <form id="generator-form">
+                            <div class="form-group">
+                                <label for="ai_provider">AI Provider (Nhà cung cấp)</label>
+                                <select id="ai_provider" style="width: 100%; padding: 12px 16px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-color); font-size: 0.92rem; font-family: var(--font-mono); outline: none; transition: all 0.2s ease;">
+                                    <option value="gemini">Google Gemini (Gemini 1.5 Flash)</option>
+                                    <option value="openai">OpenAI (GPT-4o-mini)</option>
+                                    <option value="claude">Anthropic Claude (Claude 3.5 Sonnet)</option>
+                                    <option value="local">Local (Ollama Cục Bộ)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="openai_key" id="api_key_label">API Key</label>
+                                <input type="password" id="openai_key" placeholder="AIzaSy..." required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="db_url">PostgreSQL DB URL</label>
+                                <input type="text" id="db_url" value="postgresql://postgres:postgres@localhost:5432/postgres">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="sd_url">Stable Diffusion API (GPU)</label>
+                                <input type="text" id="sd_url" value="http://localhost:7860">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="topic">Chủ đề Video (Topic)</label>
+                                <textarea id="topic" rows="3" placeholder="Ví dụ: Bí ẩn kỳ lạ về Tam giác quỷ Bermuda..." required></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn-submit" id="btn-submit">1. SÁNG TÁC KỊCH BẢN</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Cột Phải: Xem thử kịch bản, biên tập + Dựng video + Xuất bản -->
+                <div class="panel sticky-right-panel" style="padding: 0; overflow: hidden;">
+                    <!-- IDE style tabs for Right Panel -->
+                    <div class="pane-tabs-container">
+                        <div class="pane-tab active" id="tab-waiting-editor">
+                            <span class="tab-icon">⚙</span>
+                            <span class="tab-name" id="tab-setup-name">workspace_setup.log</span>
+                        </div>
+                        <div class="pane-tab" id="tab-timeline" style="display: none;">
+                            <span class="tab-icon">{}</span>
+                            <span class="tab-name">timeline.json</span>
+                        </div>
+                        <div class="pane-tab" id="tab-video" style="display: none;">
+                            <span class="tab-icon">▶</span>
+                            <span class="tab-name">output.mp4</span>
+                        </div>
+                        <div class="pane-tab" id="tab-db-report">
+                            <span class="tab-icon">🗄</span>
+                            <span class="tab-name">db_report.sql</span>
+                        </div>
+                    </div>
+
+                    <div class="pane-content-wrapper">
+                        <!-- Trạng thái chờ / Logs hoạt động hệ thống -->
+                        <div id="status-waiting" style="width: 100%; display: flex; flex-direction: column; align-items: stretch; height: 350px;">
+                            <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); margin-bottom: 6px; display: flex; justify-content: space-between; user-select: none;">
+                                <span>SYSTEM SESSION: ACTIVE</span>
+                                <span id="log-time-indicator">00:00:00</span>
+                            </div>
+                            <pre id="system-logs-area" style="flex-grow: 1; margin: 0; border-radius: 6px; font-size: 0.78rem; text-align: left; background: #0d0e11; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5); overflow-y: auto; color: #a7f3d0; white-space: pre-wrap; word-break: break-all; height: 320px; line-height: 1.5; border: 1px solid var(--border-color); padding: 15px;"></pre>
+                        </div>
+
+                        <!-- Loader và Logs -->
+                        <div id="status-loading" class="status-container">
+                            <div class="spinner"></div>
+                            <h3 style="margin-bottom: 8px;" id="loading-header">Đang sản xuất video...</h3>
+                            <p id="loading-step" style="color: var(--text-muted); font-size: 0.9rem;">Đang kết nối database...</p>
+                        </div>
+
+                        <!-- BƯỚC 1.5: BIÊN TẬP KỊCH BẢN (JSON EDITOR) -->
+                        <div id="editor-wrapper" style="display: none; flex-direction: column; width: 100%; height: 100%;">
+                            <h3 style="margin-bottom: 8px; font-family: var(--font-mono); font-size: 1.1rem; color: var(--accent-color);">✎ Biên Tập Kịch Bản (JSON)</h3>
+                            <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 12px; line-height: 1.4;">Bạn có thể chỉnh sửa câu thuyết minh (voice_text) hoặc mô tả ảnh (visual_prompt) trực tiếp dưới đây trước khi bấm Dựng video.</p>
+                             <div class="form-group" style="width: 100%;">
+                                <textarea id="timeline-editor" style="font-family: var(--font-mono); font-size: 0.78rem; line-height: 1.4; color: #38bdf8; height: 320px; background: #0d0e11; resize: vertical;" rows="15"></textarea>
+                            </div>
+                            <button type="button" class="btn-submit btn-teal" id="btn-render" style="margin-top: 10px;">
+                                2. BẮT ĐẦU DỰNG VIDEO
+                            </button>
+                        </div>
+
+                        <!-- Video Player & Phản hồi viết lại (A/B Feedback) & Publish -->
+                        <div id="video-wrapper" class="video-container">
+                            <h3 style="margin-bottom: 12px; font-family: var(--font-mono); font-size: 1.1rem; color: var(--accent-emerald);">✓ Đã Dựng Thành Phẩm!</h3>
+                            <video id="video-player" controls>
+                                <source src="" type="video/mp4">
+                            </video>
+                            
+                            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                                <a href="" id="download-link" class="btn-secondary btn-action-main" download>Tải Video Về Máy</a>
+                            </div>
+
+                            <!-- SYSTEM 7: ĐIỀU CHỈNH KỊCH BẢN (REGENERATE FEEDBACK) -->
+                            <div class="form-group" style="width: 100%; border-top: 1px solid var(--border-color); padding-top: 15px;">
+                                <label>Yêu cầu sửa đổi (Viết lại kịch bản & Sinh lại ảnh)</label>
+                                <textarea id="feedback-text" rows="2" placeholder="Ví dụ: 'Tôi không muốn nhân vật chính là nam, tôi muốn hình ảnh chân thật và nhiều cảnh hành động hơn'"></textarea>
+                                <button type="button" class="btn-secondary" id="btn-regenerate" style="width: 100%; margin-top: 10px; border-color: var(--accent-color); color: var(--accent-color);">
+                                    Tạo Lại Bản Video Mới
+                                </button>
+                            </div>
+
+                            <!-- SYSTEM 6: XUẤT BẢN ĐA NỀN TẢNG (PUBLISH SIMULATOR) -->
+                            <div class="publish-box">
+                                <label>System 6 — Cấu hình & Xuất bản đa nền tảng</label>
+                                <div class="platforms-list">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox" name="platform" value="youtube" checked> YouTube
+                                    </label>
+                                    <label class="checkbox-container">
+                                        <input type="checkbox" name="platform" value="facebook" checked> Facebook
+                                    </label>
+                                    <label class="checkbox-container">
+                                        <input type="checkbox" name="platform" value="ganjing_world" checked> Ganjing World
+                                    </label>
+                                    <label class="checkbox-container">
+                                        <input type="checkbox" name="platform" value="tiktok" checked> TikTok
+                                    </label>
+                                </div>
+                                <button type="button" class="btn-submit" id="btn-publish" style="padding: 12px; font-size: 0.9rem;">
+                                    Xuất Bản Video
+                                </button>
+                                <div class="publish-logs" id="publish-logs-panel"></div>
+                            </div>
+                        </div>
+
+                        <!-- BÁO CÁO CƠ SỞ DỮ LIỆU POSTGRESQL -->
+                        <div id="db-report-wrapper" style="display: none; flex-direction: column; width: 100%; height: 100%;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; width: 100%;">
+                                <h3 style="font-family: var(--font-mono); font-size: 1.1rem; color: var(--accent-emerald);">🗄 PostgreSQL & Graph Database Report</h3>
+                                <button type="button" class="btn-secondary" id="btn-refresh-db" style="padding: 6px 12px; font-size: 0.72rem; border-color: var(--accent-emerald); color: var(--accent-emerald); border-radius: 4px; background: transparent; cursor: pointer;">Tải Lại</button>
+                            </div>
+                            <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 12px; line-height: 1.4;">
+                                Nhật ký truy vấn thực tế dữ liệu kịch bản và thực thể đồ thị.
+                            </p>
+                            <pre id="db-output" style="flex-grow: 1; margin: 0; border-radius: 6px; font-size: 0.75rem; text-align: left; background: #0d0e11; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5); overflow-y: auto; color: #38bdf8; white-space: pre-wrap; word-break: break-all; height: 320px; line-height: 1.5; border: 1px solid var(--border-color); padding: 15px;">Loading database summary logs...</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -584,6 +918,12 @@
             // Tải danh sách ý tưởng quét sẵn và báo cáo DB
             fetchInitialIdeas();
             refreshDbReport();
+
+            // Khởi tạo tab trạng thái ban đầu
+            updateTabs("setup");
+
+            // Khởi tạo nhật ký hệ thống
+            initSystemLogs();
         });
 
         // Hàm cập nhật nhãn nhập API key động theo Provider được chọn
@@ -606,7 +946,7 @@
                 }
                 
                 if (provider === "openai") {
-                    input.placeholder = "sk-proj-...";
+                     input.placeholder = "sk-proj-...";
                 } else if (provider === "gemini") {
                     input.placeholder = "AIzaSy...";
                 } else if (provider === "claude") {
@@ -646,8 +986,11 @@
                     
                     document.getElementById("topic").value = idea.title;
                     const topicInput = document.getElementById("topic");
-                    topicInput.style.borderColor = "#6366f1";
+                    topicInput.style.borderColor = "var(--primary-glow)";
                     setTimeout(() => { topicInput.style.borderColor = ""; }, 600);
+                    
+                    // Ghi log hoạt động hệ thống
+                    addSystemLog(`Selected idea: "${idea.title}" (Views: ${idea.views.toLocaleString()} | Virality: ${idea.virality}/10)`, "info");
                 });
                 
                 container.appendChild(card);
@@ -694,17 +1037,24 @@
             btn.disabled = true;
             container.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem; text-align: center;">Đang quét nội dung từ đối thủ...</p>`;
             
+            // Ghi log hoạt động hệ thống
+            addSystemLog(`Initiating competitor scraper for keyword: "${keyword}"`, "system");
+            addSystemLog(`Connecting to search APIs and scraping channels...`, "info");
+            
             try {
                 const res = await fetch("/api/scrape-ideas?keyword=" + encodeURIComponent(keyword));
                 const data = await res.json();
                 
                 if (data.status === "success" && data.ideas.length > 0) {
                     renderIdeas(data.ideas);
+                    addSystemLog(`Successfully scraped ${data.ideas.length} trending ideas from competitors.`, "success");
                 } else {
                     container.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem; text-align: center;">Không tìm thấy chủ đề nào. Vui lòng thử lại.</p>`;
+                    addSystemLog(`Scraper query completed with 0 results.`, "warn");
                 }
             } catch (err) {
                 container.innerHTML = `<p style="color: #ef4444; font-size: 0.85rem; text-align: center;">Lỗi kết nối máy chủ quét.</p>`;
+                addSystemLog(`Scraper API failed: ${err.message}`, "error");
             } finally {
                 btn.disabled = false;
             }
@@ -724,12 +1074,21 @@
             localStorage.setItem("sd_url", sdUrl);
             localStorage.setItem("ai_provider", provider);
 
+            // Ghi log hoạt động hệ thống
+            addSystemLog(`Initiating script timeline generation for topic: "${topic}"`, "system");
+            addSystemLog(`Selected AI provider: "${provider}"`, "info");
+            if (feedback) {
+                addSystemLog(`Applying revision feedback: "${feedback}"`, "info");
+            }
+
             // Cập nhật giao diện ẩn/hiện
             document.getElementById("status-waiting").style.display = "none";
             document.getElementById("editor-wrapper").style.display = "none";
             document.getElementById("video-wrapper").style.display = "none";
+            document.getElementById("db-report-wrapper").style.display = "none";
             document.getElementById("status-loading").style.display = "flex";
             document.getElementById("btn-submit").disabled = true;
+            updateTabs("generating");
 
             const stepLabel = document.getElementById("loading-step");
             document.getElementById("loading-header").textContent = "Đang biên soạn kịch bản...";
@@ -754,15 +1113,18 @@
                     document.getElementById("editor-wrapper").style.display = "flex";
                     // Ghi kịch bản thô vào Textarea editor định dạng dễ nhìn
                     document.getElementById("timeline-editor").value = JSON.stringify(result.timeline, null, 4);
+                    updateTabs("timeline");
                 } else {
                     alert("Lỗi biên soạn kịch bản: " + result.message);
                     document.getElementById("status-loading").style.display = "none";
                     document.getElementById("status-waiting").style.display = "flex";
+                    updateTabs("setup");
                 }
             } catch (err) {
                 alert("Lỗi kết nối máy chủ Web.");
                 document.getElementById("status-loading").style.display = "none";
                 document.getElementById("status-waiting").style.display = "flex";
+                updateTabs("setup");
             } finally {
                 document.getElementById("btn-submit").disabled = false;
             }
@@ -784,8 +1146,10 @@
             const btnRender = document.getElementById("btn-render");
 
             document.getElementById("editor-wrapper").style.display = "none";
+            document.getElementById("db-report-wrapper").style.display = "none";
             document.getElementById("status-loading").style.display = "flex";
             btnRender.disabled = true;
+            updateTabs("rendering");
 
             const stepLabel = document.getElementById("loading-step");
             document.getElementById("loading-header").textContent = "Đang dựng video thành phẩm...";
@@ -832,16 +1196,19 @@
 
                     document.getElementById("download-link").href = result.video_url;
                     document.getElementById("db-output").textContent = result.db_summary;
+                    updateTabs("video");
                 } else {
                     alert("Lỗi dựng video: " + result.message);
                     document.getElementById("status-loading").style.display = "none";
                     document.getElementById("editor-wrapper").style.display = "flex";
+                    updateTabs("timeline");
                 }
             } catch (err) {
                 timers.forEach(t => clearTimeout(t));
                 alert("Lỗi kết nối máy chủ Web.");
                 document.getElementById("status-loading").style.display = "none";
                 document.getElementById("editor-wrapper").style.display = "flex";
+                updateTabs("timeline");
             } finally {
                 btnRender.disabled = false;
             }
@@ -909,6 +1276,181 @@
                 btn.disabled = false;
             }
         });
+
+        // Hàm cập nhật trạng thái tab IDE
+        function updateTabs(activeTabId) {
+            const tabSetup = document.getElementById("tab-waiting-editor");
+            const tabTimeline = document.getElementById("tab-timeline");
+            const tabVideo = document.getElementById("tab-video");
+            const tabDb = document.getElementById("tab-db-report");
+            const tabSetupName = document.getElementById("tab-setup-name");
+            
+            // Remove active classes
+            tabSetup.classList.remove("active");
+            tabTimeline.classList.remove("active");
+            tabVideo.classList.remove("active");
+            tabDb.classList.remove("active");
+            
+            if (activeTabId === "setup") {
+                tabSetup.style.display = "flex";
+                tabSetup.classList.add("active");
+                tabSetupName.textContent = "workspace_setup.log";
+            } else if (activeTabId === "generating") {
+                tabSetup.style.display = "flex";
+                tabSetup.classList.add("active");
+                tabSetupName.textContent = "generating_script.log";
+            } else if (activeTabId === "rendering") {
+                tabSetup.style.display = "flex";
+                tabSetup.classList.add("active");
+                tabSetupName.textContent = "rendering_video.log";
+            } else if (activeTabId === "timeline") {
+                tabSetup.style.display = "flex";
+                tabTimeline.style.display = "flex";
+                tabTimeline.classList.add("active");
+            } else if (activeTabId === "video") {
+                tabSetup.style.display = "flex";
+                tabTimeline.style.display = "flex";
+                tabVideo.style.display = "flex";
+                tabVideo.classList.add("active");
+            } else if (activeTabId === "db_report") {
+                tabDb.classList.add("active");
+            }
+        }
+
+        // Đăng ký sự kiện click tab để chuyển đổi qua lại
+        document.getElementById("tab-waiting-editor").addEventListener("click", () => {
+            const tabSetupName = document.getElementById("tab-setup-name").textContent;
+            
+            document.getElementById("editor-wrapper").style.display = "none";
+            document.getElementById("video-wrapper").style.display = "none";
+            document.getElementById("db-report-wrapper").style.display = "none";
+            
+            if (tabSetupName === "workspace_setup.log") {
+                document.getElementById("status-waiting").style.display = "flex";
+                document.getElementById("status-loading").style.display = "none";
+                updateTabs("setup");
+            } else {
+                document.getElementById("status-waiting").style.display = "none";
+                document.getElementById("status-loading").style.display = "flex";
+                const currentName = tabSetupName.split(".")[0];
+                updateTabs(currentName === "generating_script" ? "generating" : "rendering");
+            }
+            
+            document.getElementById("menu-console").classList.add("active");
+            document.getElementById("menu-db-report").classList.remove("active");
+        });
+
+        document.getElementById("tab-timeline").addEventListener("click", () => {
+            if (document.getElementById("tab-timeline").style.display !== "none") {
+                document.getElementById("status-waiting").style.display = "none";
+                document.getElementById("status-loading").style.display = "none";
+                document.getElementById("video-wrapper").style.display = "none";
+                document.getElementById("db-report-wrapper").style.display = "none";
+                document.getElementById("editor-wrapper").style.display = "flex";
+                updateTabs("timeline");
+                
+                document.getElementById("menu-console").classList.add("active");
+                document.getElementById("menu-db-report").classList.remove("active");
+            }
+        });
+
+        document.getElementById("tab-video").addEventListener("click", () => {
+            if (document.getElementById("tab-video").style.display !== "none") {
+                document.getElementById("status-waiting").style.display = "none";
+                document.getElementById("status-loading").style.display = "none";
+                document.getElementById("editor-wrapper").style.display = "none";
+                document.getElementById("db-report-wrapper").style.display = "none";
+                document.getElementById("video-wrapper").style.display = "flex";
+                updateTabs("video");
+                
+                document.getElementById("menu-console").classList.add("active");
+                document.getElementById("menu-db-report").classList.remove("active");
+            }
+        });
+
+        document.getElementById("tab-db-report").addEventListener("click", () => {
+            document.getElementById("status-waiting").style.display = "none";
+            document.getElementById("status-loading").style.display = "none";
+            document.getElementById("editor-wrapper").style.display = "none";
+            document.getElementById("video-wrapper").style.display = "none";
+            document.getElementById("db-report-wrapper").style.display = "flex";
+            updateTabs("db_report");
+            refreshDbReport();
+            
+            document.getElementById("menu-db-report").classList.add("active");
+            document.getElementById("menu-console").classList.remove("active");
+        });
+
+        // Đăng ký sự kiện menu toolbar click
+        document.getElementById("menu-console").addEventListener("click", () => {
+            document.getElementById("menu-console").classList.add("active");
+            document.getElementById("menu-db-report").classList.remove("active");
+            
+            const tabSetupName = document.getElementById("tab-setup-name").textContent;
+            
+            document.getElementById("editor-wrapper").style.display = "none";
+            document.getElementById("video-wrapper").style.display = "none";
+            document.getElementById("db-report-wrapper").style.display = "none";
+            
+            if (tabSetupName === "workspace_setup.log") {
+                document.getElementById("status-waiting").style.display = "flex";
+                document.getElementById("status-loading").style.display = "none";
+                updateTabs("setup");
+            } else {
+                document.getElementById("status-waiting").style.display = "none";
+                document.getElementById("status-loading").style.display = "flex";
+                const currentName = tabSetupName.split(".")[0];
+                updateTabs(currentName === "generating_script" ? "generating" : "rendering");
+            }
+        });
+
+        document.getElementById("menu-db-report").addEventListener("click", () => {
+            document.getElementById("menu-db-report").classList.add("active");
+            document.getElementById("menu-console").classList.remove("active");
+            
+            document.getElementById("status-waiting").style.display = "none";
+            document.getElementById("status-loading").style.display = "none";
+            document.getElementById("editor-wrapper").style.display = "none";
+            document.getElementById("video-wrapper").style.display = "none";
+            document.getElementById("db-report-wrapper").style.display = "flex";
+            updateTabs("db_report");
+            refreshDbReport();
+        });
+
+        // Hàm ghi nhật ký hoạt động hệ thống (System Logs)
+        function addSystemLog(message, type = "info") {
+            const logsArea = document.getElementById("system-logs-area");
+            if (!logsArea) return;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            let prefix = `[${timestamp}] [INFO]    `;
+            if (type === "error") prefix = `[${timestamp}] [ERROR]   `;
+            if (type === "success") prefix = `[${timestamp}] [SUCCESS] `;
+            if (type === "warn") prefix = `[${timestamp}] [WARN]    `;
+            if (type === "system") prefix = `[${timestamp}] [SYSTEM]  `;
+            
+            logsArea.textContent += `${prefix}${message}\n`;
+            logsArea.scrollTop = logsArea.scrollHeight;
+        }
+
+        // Hàm khởi tạo nhật ký hệ thống ban đầu
+        function initSystemLogs() {
+            const logsArea = document.getElementById("system-logs-area");
+            if (logsArea) {
+                logsArea.textContent = "";
+            }
+            
+            const timeIndicator = document.getElementById("log-time-indicator");
+            if (timeIndicator) {
+                timeIndicator.textContent = new Date().toLocaleTimeString();
+            }
+            
+            addSystemLog("Initializing Antigravity Workspace Environment...", "system");
+            addSystemLog("OS: Windows | Environment: Python v3.11.2 (.venv)", "info");
+            addSystemLog("PostgreSQL DB Server: postgresql://postgres:***@localhost:5432/postgres", "info");
+            addSystemLog("AI Content Factory Local API Services online.", "success");
+            addSystemLog("System waiting for task initiation. Select an idea or enter topic.", "warn");
+        }
     </script>
 </body>
 </html>
