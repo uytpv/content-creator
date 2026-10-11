@@ -751,10 +751,10 @@
                             <div class="form-group">
                                 <label for="ai_provider">AI Provider (Nhà cung cấp)</label>
                                 <select id="ai_provider" style="width: 100%; padding: 12px 16px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-color); font-size: 0.92rem; font-family: var(--font-mono); outline: none; transition: all 0.2s ease;">
-                                    <option value="gemini">Google Gemini (Gemini 1.5 Flash)</option>
+                                    <option value="local">Local (Ollama Cục Bộ - GLM4)</option>
+                                    <option value="gemini">Google Gemini (Gemini 2.0 Flash)</option>
                                     <option value="openai">OpenAI (GPT-4o-mini)</option>
                                     <option value="claude">Anthropic Claude (Claude 3.5 Sonnet)</option>
-                                    <option value="local">Local (Ollama Cục Bộ)</option>
                                 </select>
                             </div>
 
@@ -771,6 +771,14 @@
                             <div class="form-group">
                                 <label for="sd_url">Stable Diffusion API (GPU)</label>
                                 <input type="text" id="sd_url" value="http://localhost:7860">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="duration">Thời lượng Video (Duration)</label>
+                                <select id="duration" style="width: 100%; padding: 12px 16px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-color); font-size: 0.92rem; font-family: var(--font-mono); outline: none; transition: all 0.2s ease;">
+                                    <option value="short">Video ngắn (Shorts - 30-45 giây)</option>
+                                    <option value="long">Video dài (YouTube - 15-20 phút)</option>
+                                </select>
                             </div>
                             
                             <div class="form-group">
@@ -905,7 +913,7 @@
             const savedKey = localStorage.getItem("openai_key");
             const savedDbUrl = localStorage.getItem("db_url");
             const savedSdUrl = localStorage.getItem("sd_url");
-            const savedProvider = localStorage.getItem("ai_provider") || "gemini";
+            const savedProvider = localStorage.getItem("ai_provider") || "local";
 
             if (savedKey) document.getElementById("openai_key").value = savedKey;
             if (savedDbUrl) document.getElementById("db_url").value = savedDbUrl;
@@ -934,14 +942,14 @@
             if (provider === "local") {
                 label.textContent = "Ollama Model Name (Tên Model)";
                 input.type = "text";
-                input.placeholder = "Ví dụ: llama3, qwen2.5, mistral, deepseek-coder";
-                if (input.value === "" || input.value.startsWith("sk-") || input.value.startsWith("AIzaSy")) {
-                    input.value = "llama3";
+                input.placeholder = "Ví dụ: glm-5.2, glm4, qwen2.5, llama3, deepseek-coder";
+                if (input.value === "" || input.value.startsWith("sk-") || input.value.startsWith("AIzaSy") || input.value === "llama3" || input.value === "glm4") {
+                    input.value = "glm-5.2";
                 }
             } else {
                 label.textContent = "API Key";
                 input.type = "password";
-                if (input.value === "llama3") {
+                if (input.value === "glm-5.2" || input.value === "glm4" || input.value === "llama3") {
                     input.value = "";
                 }
                 
@@ -958,6 +966,22 @@
         // Lắng nghe sự kiện đổi Nhà Cung Cấp
         document.getElementById("ai_provider").addEventListener("change", (e) => {
             updateApiKeyLabel(e.target.value);
+            addSystemLog("Changed AI Provider to: " + e.target.value, "info");
+        });
+
+        // Lắng nghe sự kiện đổi API Key / Ollama model tag
+        document.getElementById("openai_key").addEventListener("change", (e) => {
+            addSystemLog("Updated API key / Ollama model tag to: " + (e.target.type === "password" ? "****" : e.target.value), "info");
+        });
+
+        // Lắng nghe sự kiện đổi URL PostgreSQL
+        document.getElementById("db_url").addEventListener("change", (e) => {
+            addSystemLog("Updated PostgreSQL DB URL to: " + e.target.value, "info");
+        });
+
+        // Lắng nghe sự kiện đổi URL Stable Diffusion API
+        document.getElementById("sd_url").addEventListener("change", (e) => {
+            addSystemLog("Updated Stable Diffusion API URL to: " + e.target.value, "info");
         });
 
         // Hàm vẽ danh sách ý tưởng
@@ -1095,6 +1119,7 @@
             stepLabel.textContent = "Khởi tạo... Đang gửi yêu cầu tới AI Agent...";
 
             try {
+                const duration = document.getElementById("duration").value;
                 const response = await fetch("/api/generate-script", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -1102,7 +1127,8 @@
                         topic: topic,
                         openai_key: openaiKey,
                         provider: provider,
-                        feedback: feedback
+                        feedback: feedback,
+                        duration: duration
                     })
                 });
 
@@ -1152,22 +1178,50 @@
             updateTabs("rendering");
 
             const stepLabel = document.getElementById("loading-step");
-            document.getElementById("loading-header").textContent = "Đang dựng video thành phẩm...";
+            const loadingHeader = document.getElementById("loading-header");
+            loadingHeader.textContent = "Đang dựng video thành phẩm...";
             stepLabel.textContent = "Khởi tạo... Đang kết nối database...";
 
-            const statusSteps = [
-                { time: 1000, text: "Đang phân tích kịch bản đã duyệt và cấu hình timeline..." },
-                { time: 3000, text: "Đang sinh giọng nói tiếng Việt chuẩn (Edge-TTS) và mốc thời gian..." },
-                { time: 7000, text: "Đang vẽ ảnh cảnh (Stable Diffusion) / dựng biểu đồ thống kê..." },
-                { time: 13000, text: "FFmpeg đang tiến hành zoompan và chèn phụ đề ASS..." },
-                { time: 20000, text: "Đang chèn âm thanh chuyển cảnh SFX và trộn nhạc nền..." }
-            ];
-
-            const timers = statusSteps.map(step => {
-                return setTimeout(() => {
-                    stepLabel.textContent = step.text;
-                }, step.time);
-            });
+            async function pollRenderStatus() {
+                try {
+                    const statusRes = await fetch("/api/render-status");
+                    const statusData = await statusRes.json();
+                    
+                    if (statusData.status === "rendering") {
+                        loadingHeader.textContent = `Đang dựng video thành phẩm (${statusData.percent}%)`;
+                        stepLabel.textContent = statusData.message;
+                        
+                        addSystemLog(`[Dựng video] Tiến độ: ${statusData.percent}% - ${statusData.message}`, "info");
+                        
+                        setTimeout(pollRenderStatus, 1500);
+                    } else if (statusData.status === "success") {
+                        document.getElementById("status-loading").style.display = "none";
+                        document.getElementById("video-wrapper").style.display = "flex";
+                        
+                        const player = document.getElementById("video-player");
+                        player.src = "/static/output.mp4?t=" + new Date().getTime();
+                        player.load();
+                        
+                        document.getElementById("download-link").href = "/static/output.mp4";
+                        document.getElementById("db-output").textContent = statusData.db_summary;
+                        
+                        addSystemLog("Hoàn tất tác vụ dựng video thành phẩm thành công!", "success");
+                        updateTabs("video");
+                        btnRender.disabled = false;
+                    } else if (statusData.status === "error") {
+                        alert(statusData.message);
+                        document.getElementById("status-loading").style.display = "none";
+                        document.getElementById("editor-wrapper").style.display = "flex";
+                        updateTabs("timeline");
+                        btnRender.disabled = false;
+                    } else {
+                        setTimeout(pollRenderStatus, 1500);
+                    }
+                } catch (err) {
+                    console.error("Lỗi thăm dò tiến độ:", err);
+                    setTimeout(pollRenderStatus, 1500);
+                }
+            }
 
             try {
                 const response = await fetch("/api/render-video", {
@@ -1180,36 +1234,22 @@
                     })
                 });
 
-                timers.forEach(t => clearTimeout(t));
-                const result = await response.json();
-
-                if (result.status === "success") {
-                    currentScriptId = result.script_id;
-                    currentFilepath = result.filepath;
-
-                    document.getElementById("status-loading").style.display = "none";
-                    document.getElementById("video-wrapper").style.display = "flex";
-
-                    const player = document.getElementById("video-player");
-                    player.src = result.video_url + "?t=" + new Date().getTime();
-                    player.load();
-
-                    document.getElementById("download-link").href = result.video_url;
-                    document.getElementById("db-output").textContent = result.db_summary;
-                    updateTabs("video");
+                const startResult = await response.json();
+                if (startResult.status === "started") {
+                    addSystemLog("Khởi chạy tác vụ dựng video nền thành công.", "system");
+                    pollRenderStatus();
                 } else {
-                    alert("Lỗi dựng video: " + result.message);
+                    alert("Lỗi bắt đầu dựng video: " + startResult.message);
                     document.getElementById("status-loading").style.display = "none";
                     document.getElementById("editor-wrapper").style.display = "flex";
                     updateTabs("timeline");
+                    btnRender.disabled = false;
                 }
             } catch (err) {
-                timers.forEach(t => clearTimeout(t));
                 alert("Lỗi kết nối máy chủ Web.");
                 document.getElementById("status-loading").style.display = "none";
                 document.getElementById("editor-wrapper").style.display = "flex";
                 updateTabs("timeline");
-            } finally {
                 btnRender.disabled = false;
             }
         });

@@ -44,7 +44,21 @@ async def generate_voice_and_subtitles_async(text, voice_code, audio_output_path
 
 def generate_voice_and_subtitles(text, voice_code, audio_output_path):
     """Bọc đồng bộ để gọi từ các module khác."""
-    return asyncio.run(generate_voice_and_subtitles_async(text, voice_code, audio_output_path))
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = None
+        
+    if loop and loop.is_running():
+        import concurrent.futures
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(
+                asyncio.run, 
+                generate_voice_and_subtitles_async(text, voice_code, audio_output_path)
+            )
+            return future.result()
+    else:
+        return asyncio.run(generate_voice_and_subtitles_async(text, voice_code, audio_output_path))
 
 # Thử nghiệm độc lập
 if __name__ == "__main__":

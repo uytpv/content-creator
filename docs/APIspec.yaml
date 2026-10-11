@@ -1,0 +1,576 @@
+openapi: 3.0.3
+info:
+  title: CreatorOS Local API
+  description: >
+    API local cho hệ thống nghiên cứu và lập kế hoạch nội dung YouTube
+    single-user. Hệ thống chỉ phục vụ chủ sở hữu và chạy trên localhost.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Local development server
+
+tags:
+  - name: Settings
+  - name: Niches
+  - name: Channels
+  - name: Videos
+  - name: Ideas
+  - name: Analytics
+  - name: Jobs
+
+paths:
+  /settings:
+    get:
+      tags: [Settings]
+      summary: Lấy cấu hình hệ thống
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Settings"
+
+    patch:
+      tags: Settings
+      summary: Cập nhật cấu hình
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SettingsUpdate"
+      responses:
+        "200":
+          description: Updated
+
+  /settings/youtube/connect:
+    post:
+      tags: Settings
+      summary: Bắt đầu OAuth kết nối kênh YouTube riêng
+      responses:
+        "200":
+          description: OAuth authorization URL
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  authorization_url:
+                    type: string
+
+  /niches:
+    get:
+      tags: Niches
+      summary: Danh sách ngách
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Niche"
+
+    post:
+      tags: Niches
+      summary: Tạo ngách
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NicheCreate"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Niche"
+
+  /niches/{niche_id}:
+    get:
+      tags: Niches
+      summary: Chi tiết ngách
+      parameters:
+        - name: niche_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Niche"
+
+    patch:
+      tags: Niches
+      summary: Cập nhật ngách
+      parameters:
+        - name: niche_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NicheUpdate"
+      responses:
+        "200":
+          description: Updated
+
+  /niches/research:
+    post:
+      tags: Niches
+      summary: Nghiên cứu từ khoá hoặc kênh
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResearchRequest"
+      responses:
+        "202":
+          description: Research job accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobResponse"
+
+  /channels:
+    get:
+      tags: Channels
+      summary: Danh sách kênh đang theo dõi
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Channel"
+
+    post:
+      tags: Channels
+      summary: Thêm kênh vào watchlist
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChannelCreate"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Channel"
+
+  /channels/{channel_id}/sync:
+    post:
+      tags: Channels
+      summary: Đồng bộ metadata kênh và video
+      parameters:
+        - name: channel_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "202":
+          description: Sync job accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobResponse"
+
+  /channels/{channel_id}/videos:
+    get:
+      tags: Channels
+      summary: Danh sách video của kênh
+      parameters:
+        - name: channel_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Video"
+
+  /videos/{video_id}:
+    get:
+      tags: Videos
+      summary: Chi tiết video
+      parameters:
+        - name: video_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Video"
+
+  /outliers:
+    get:
+      tags: Videos
+      summary: Danh sách video outlier
+      parameters:
+        - name: niche_id
+          in: query
+          schema:
+            type: string
+        - name: days
+          in: query
+          schema:
+            type: integer
+            default: 30
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Video"
+
+  /ideas:
+    get:
+      tags: Ideas
+      summary: Danh sách idea
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Idea"
+
+    post:
+      tags: Ideas
+      summary: Tạo idea
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IdeaCreate"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Idea"
+
+  /ideas/{idea_id}/generate-brief:
+    post:
+      tags: Ideas
+      summary: Sinh video brief bằng AI
+      parameters:
+        - name: idea_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "202":
+          description: Generation job accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobResponse"
+
+  /ideas/{idea_id}/brief:
+    get:
+      tags: Ideas
+      summary: Lấy video brief
+      parameters:
+        - name: idea_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VideoBrief"
+
+  /my-channel/performance:
+    get:
+      tags: Jobs
+      summary: Hiệu suất kênh riêng
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MyChannelVideo"
+
+  /jobs/{job_id}:
+    get:
+      tags: Jobs
+      summary: Trạng thái job
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobStatus"
+
+components:
+  schemas:
+    Settings:
+      type: object
+      properties:
+        youtube_connected:
+          type: boolean
+        default_sync_interval_hours:
+          type: integer
+        max_concurrent_jobs:
+          type: integer
+
+    SettingsUpdate:
+      type: object
+      properties:
+        default_sync_interval_hours:
+          type: integer
+        default_concurrent_jobs:
+          type: integer
+
+    Niche:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        keywords:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+
+    NicheCreate:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        keywords:
+          type: array
+          items:
+            type: string
+        description:
+          type: string
+
+    NicheUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        keywords:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+
+    ResearchRequest:
+      type: object
+      required: [query]
+      properties:
+        query:
+          type: string
+        query_type:
+          type: string
+          enum: [keyword, channel_url, video_url]
+        niche_id:
+          type: string
+
+    Channel:
+      type: object
+      properties:
+        id:
+          type: string
+        youtube_channel_id:
+          type: string
+        title:
+          type: string
+        subscriber_count:
+          type: integer
+        watch_status:
+          type: string
+        last_synced_at:
+          type: string
+          format: date-time
+
+    ChannelCreate:
+      type: object
+      required: [youtube_channel_id]
+      properties:
+        youtube_channel_id:
+          type: string
+        niche_id:
+          type: string
+        watch_reason:
+          type: string
+
+    Video:
+      type: object
+      properties:
+        id:
+          type: string
+        youtube_video_id:
+          type: string
+        title:
+          type: string
+        published_at:
+          type: string
+          format: date-time
+        view_count:
+          type: integer
+        is_outlier_candidate:
+          type: boolean
+        outlier_score:
+          type: number
+        outlier_method_version:
+          type: string
+
+    Idea:
+      type: object
+      properties:
+        id:
+          type: string
+        niche_id:
+          type: string
+        title_candidate:
+          type: string
+        angle:
+          type: string
+        status:
+          type: string
+        priority:
+          type: integer
+        user_approved:
+          type: boolean
+
+    IdeaCreate:
+      type: object
+      required: [niche_id, title_candidate]
+      properties:
+        niche_id:
+          type: string
+        title_candidate:
+          type: string
+        angle:
+          type: string
+        source_channel_id:
+          type: string
+        source_video_id:
+          type: string
+
+    VideoBrief:
+      type: object
+      properties:
+        id:
+          type: string
+        idea_id:
+          type: string
+        final_title:
+          type: string
+        hook:
+          type: string
+        outline:
+          type: array
+          items:
+            type: string
+        thumbnail_brief:
+          type: string
+        description_draft:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+
+    MyChannelVideo:
+      type: object
+      properties:
+        youtube_video_id:
+          type: string
+        title:
+          type: string
+        views:
+          type: integer
+        estimated_minutes_watched:
+          type: integer
+        average_view_percentage:
+          type: number
+        performance:
+          type: string
+          enum: [strong, normal, weak, anomaly]
+
+    JobResponse:
+      type: object
+      properties:
+        job_id:
+          type: string
+        status:
+          type: string
+
+    JobStatus:
+      type: object
+      properties:
+        job_id:
+          type: string
+        status:
+          type: string
+        quota_units_used:
+          type: integer
+        error_message:
+          type: string

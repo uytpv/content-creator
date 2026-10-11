@@ -14,9 +14,25 @@ from render.video_composer import compose_video
 def main():
     parser = argparse.ArgumentParser(description="AI Content Factory End-to-End Pipeline")
     parser.add_argument("--topic", type=str, default="Sự thật kinh ngạc về hố đen vũ trụ", help="Chủ đề muốn làm video")
+    parser.add_argument("--provider", type=str, default="local", help="AI provider (local, gemini, openai, claude)")
+    parser.add_argument("--api-key", type=str, default="", help="API key hoặc tên model cục bộ của Ollama (ví dụ: glm-5.2)")
     args = parser.parse_args()
     
     topic = args.topic
+    provider = args.provider.strip().lower()
+    api_key = args.api_key.strip()
+    
+    # Thiết lập mặc định cho api_key nếu trống
+    if not api_key:
+        if provider == "local":
+            api_key = "glm-5.2"
+        elif provider == "openai":
+            api_key = os.environ.get("OPENAI_API_KEY", "")
+        elif provider == "gemini":
+            api_key = os.environ.get("GEMINI_API_KEY", "")
+        elif provider == "claude":
+            api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+
     timeline_path = "src/timeline_example.json"
     output_path = "output.mp4"
     
@@ -24,13 +40,20 @@ def main():
     print("      AI CONTENT FACTORY - INTEGRATED PIPELINE    ")
     print("==================================================")
     print(f"Topic: {topic}")
+    print(f"Provider: {provider}")
+    print(f"API Key / Model: {api_key[:8]}..." if len(api_key) > 8 else f"API Key / Model: {api_key}")
     
-    # 1. Kiểm tra API Key của OpenAI
-    if "OPENAI_API_KEY" not in os.environ:
-        print("\n[Error] Khóa OPENAI_API_KEY chưa được thiết lập!")
-        print("Vui lòng thiết lập biến môi trường trước khi chạy:")
-        print("   $env:OPENAI_API_KEY=\"sk-proj-...\" (PowerShell)")
+    # 1. Kiểm tra API Key / cấu hình hợp lệ
+    if provider != "local" and not api_key:
+        print(f"\n[Error] Khóa API cho provider '{provider}' chưa được thiết lập!")
+        print("Vui lòng thiết lập biến môi trường hoặc chạy kèm tham số --api-key.")
         sys.exit(1)
+        
+    # Set env var if needed by library inside agent
+    if provider == "openai":
+        os.environ["OPENAI_API_KEY"] = api_key
+    elif provider == "claude":
+        os.environ["ANTHROPIC_API_KEY"] = api_key
         
     # 2. Khởi động và kết nối Database PostgreSQL
     print("\n--- STEP 1: INITIALIZING POSTGRESQL DATABASE ---")
@@ -44,16 +67,20 @@ def main():
         print("   $env:DATABASE_URL=\"postgresql://user:pass@host:port/dbname\"")
         sys.exit(1)
         
-    # 3. Biên kịch tự động bằng OpenAI API (Khâu A)
+    # 3. Biên kịch tự động bằng AI Agent (Khâu A)
     print("\n--- STEP 2: GENERATING SCRIPT AND TIMELINE WITH AI AGENT ---")
     try:
-        timeline = generate_script_timeline(topic)
+        timeline = generate_script_timeline(
+            topic=topic,
+            provider=provider,
+            api_key=api_key
+        )
         # Lưu nháp file JSON timeline
         with open(timeline_path, 'w', encoding='utf-8') as f:
             json.dump(timeline, f, indent=2, ensure_ascii=False)
         print("AI Script Writer finished. Storyboard JSON successfully generated.")
     except Exception as e:
-        print(f"\n[Error] Gặp lỗi khi sinh kịch bản từ OpenAI: {e}")
+        print(f"\n[Error] Gặp lỗi khi sinh kịch bản từ AI: {e}")
         traceback.print_exc()
         sys.exit(1)
         

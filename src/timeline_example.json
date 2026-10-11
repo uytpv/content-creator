@@ -1,45 +1,247 @@
 {
-  "project_title": "Bí mật của Mèo Cam (Full AI Dynamic)",
+  "project_title": "Top 5 Bí Ẩn Có Thật ở Trung Quốc Khiến Cả Thế Giới Bàng Hoàng | 360 Khám Phá",
   "voice_code": "vi-VN-HoaiMyNeural",
-  "visual_style": "cinematic painting, high detail, masterpiece",
-  "background_music": "src/mock_assets/music.wav",
-  "music_volume": 0.06,
+  "visual_style": "documentary with cinematic painting",
   "scenes": [
     {
       "scene_id": "scene_1",
-      "voice_text": "Chào các bạn! Bạn có biết điều gì khiến loài mèo cam trở nên vô cùng đặc biệt không?",
-      "visual_prompt": "A majestic orange tabby cat looking directly into the camera, warm soft lighting",
+      "voice_text": "Chào mừng các bạn đến với chương trình 'Top 5 Bí Ẩn Có Thật ở Trung Quốc Khiến Cả Thế Giới Bàng Hoàng | 360 Khám Phá'. Hãy cùng chúng tôi踏上这场神秘的探索之旅，揭开那些令人惊叹的谜团。",
+      "visual_prompt": "A breathtaking aerial view of China's Great Wall at sunrise, with the sun casting a golden glow over ancient bricks and lush greenery.",
       "effect": {
-        "type": "zoom_in",
-        "speed": 0.001
-      }
+        "type": "static",
+        "speed": null
+      },
+      "chart_data": null,
+      "chapter_id": "chapter_1",
+      "chapter_title": "Chương 1: Mở Đầu và Lời Mời Gọi",
+      "background_music": "src/mock_assets/music_dramatic.wav",
+      "music_theme": "dramatic"
     },
     {
       "scene_id": "scene_2",
-      "voice_text": "Vào thời cổ đại, mèo cam từng được người Ai Cập tôn kính như một biểu tượng của sự may mắn.",
-      "visual_prompt": "An ancient Egyptian temple with hieroglyphs, a sacred orange cat statue, warm sunset glow",
+      "voice_text": "Trung Quốc, với vẻ đẹp hùng vĩ và lịch sử sâu thẳm, ẩn chứa nhiều bí ẩn chưa thể giải mã. Hãy cùng chúng tôi điểm qua top 5 bí ẩn có thật ở Trung Quốc mà bạn không nên bỏ lỡ.",
+      "visual_prompt": "A panoramic view of the ancient city of Xi'an with its terracotta warriors in the background under a clear blue sky.",
       "effect": {
-        "type": "zoom_out",
-        "speed": 0.001
-      }
+        "type": "static",
+        "speed": null
+      },
+      "chart_data": null,
+      "chapter_id": "chapter_1",
+      "chapter_title": "Chương 1: Mở Đầu và Lời Mời Gọi",
+      "background_music": "src/mock_assets/music_dramatic.wav",
+      "music_theme": "dramatic"
     },
     {
       "scene_id": "scene_3",
-      "voice_text": "Chúng nổi tiếng vì sự nghịch ngợm, ham ăn, và tính cách vô cùng hài hước.",
-      "visual_prompt": "A funny chubby orange cat trying to grab food from a table, messy kitchen, humorous scene",
+      "voice_text": "Đầu tiên là Bức Tường Chiến Tranh, một trong những kỳ quan thế giới và biểu tượng của Trung Quốc. Nó không chỉ là một di sản văn hóa mà còn ẩn chứa nhiều bí mật lịch sử.",
+      "visual_prompt": "A detailed depiction of the Great Wall of China with lush greenery and mountains in the background, showcasing its ancient bricks and watchtowers.",
       "effect": {
         "type": "zoom_in",
-        "speed": 0.0015
-      }
+        "speed": 0.001
+      },
+      "chart_data": null,
+      "chapter_id": "chapter_1",
+      "chapter_title": "Chương 1: Mở Đầu và Lời Mời Gọi",
+      "background_music": "src/mock_assets/music_dramatic.wav",
+      "music_theme": "dramatic"
     },
     {
       "scene_id": "scene_4",
-      "voice_text": "Hãy nhấn đăng ký kênh để không bỏ lỡ những video thú vị tiếp theo nhé!",
-      "visual_prompt": "A friendly orange cat waving its paw next to a large red subscribe button, digital art style",
+      "voice_text": "Tiếp theo là Đảo Độc Lập, một hòn đảo bí ẩn với những ngôi nhà kỳ lạ và truyền thuyết về các cuộc chiến tranh giữa các bộ tộc. Đây là nơi mà nhiều người tin rằng có sự hiện diện của ma quỷ.",
+      "visual_prompt": "A mysterious island with odd-shaped houses in the middle of a tranquil sea, surrounded by misty mountains and a full moon at night.",
+      "effect": {
+        "type": "static",
+        "speed": null
+      },
+      "chart_data": null,
+      "chapter_id": "chapter_1",
+      "chapter_title": "Chương 1: Mở Đầu và Lời Mời Gọi",
+      "background_music": "src/mock_assets/music_dramatic.wav",
+      "music_theme": "dramatic"
+    },
+    {
+      "scene_id": "scene_5",
+      "voice_text": "Tiếp theo, chúng ta sẽ khám phá bí ẩn Cung Điện Hữu Ninh - một trong những cung điện lộng lẫy nhất thế giới, nhưng cũng là nơi chứa đựng nhiều câu chuyện kì quái và lịch sử đầy bí ẩn.",
+      "visual_prompt": "A majestic and ancient Chinese palace with intricate architecture, surrounded by lush gardens under a serene sky, cinematic painting.",
+      "effect": {
+        "type": "static",
+        "speed": 1
+      },
+      "chart_data": null,
+      "chapter_id": "chapter_2",
+      "chapter_title": "Bí Ẩn Số 1: Cung Điện Hửu Ninh - Kì Quái và Lịch Sử",
+      "background_music": "src/mock_assets/music_calm.wav",
+      "music_theme": "calm"
+    },
+    {
+      "scene_id": "scene_6",
+      "voice_text": "Cung Điện Hữu Ninh được xây dựng vào thế kỷ 15, dưới thời nhà Minh, với mục đích là nơi ở của các vị vua và hoàng hậu. Tuy nhiên, lịch sử của nó không chỉ dừng lại ở đó.",
+      "visual_prompt": "A historical Chinese palace during the Ming Dynasty, with a focus on ancient architecture and traditional decorations, cinematic painting.",
+      "effect": {
+        "type": "static",
+        "speed": 1
+      },
+      "chart_data": null,
+      "chapter_id": "chapter_2",
+      "chapter_title": "Bí Ẩn Số 1: Cung Điện Hửu Ninh - Kì Quái và Lịch Sử",
+      "background_music": "src/mock_assets/music_calm.wav",
+      "music_theme": "calm"
+    },
+    {
+      "scene_id": "scene_7",
+      "voice_text": "Những câu chuyện kì quái liên quan đến Cung Điện Hữu Ninh bắt đầu từ những vụ mất tích bí ẩn và những hiện tượng kỳ lạ như ánh sáng xanh băng bó, âm thanh rùng rợn và hình ảnh ma quỷ xuất hiện.",
+      "visual_prompt": "A mysterious ancient Chinese palace at night, with eerie green lights flickering and ghostly figures appearing, cinematic painting.",
+      "effect": {
+        "type": "zoom_in",
+        "speed": 0.001
+      },
+      "chart_data": null,
+      "chapter_id": "chapter_2",
+      "chapter_title": "Bí Ẩn Số 1: Cung Điện Hửu Ninh - Kì Quái và Lịch Sử",
+      "background_music": "src/mock_assets/music_calm.wav",
+      "music_theme": "calm"
+    },
+    {
+      "scene_id": "scene_8",
+      "voice_text": "Phân tích lý do tại sao Cung Điện Hữu Ninh lại trở thành một trong những bí ẩn lớn của Trung Quốc, có thể là vì lịch sử xây dựng phức tạp, sự kết hợp giữa văn hóa và truyền thuyết, và những hiện tượng không thể giải thích.",
+      "visual_prompt": "A Chinese scholar analyzing the mystery of the ancient palace in a dimly lit room, surrounded by ancient books and scrolls, cinematic painting.",
+      "effect": {
+        "type": "static",
+        "speed": 1
+      },
+      "chart_data": null,
+      "chapter_id": "chapter_2",
+      "chapter_title": "Bí Ẩn Số 1: Cung Điện Hửu Ninh - Kì Quái và Lịch Sử",
+      "background_music": "src/mock_assets/music_calm.wav",
+      "music_theme": "calm"
+    },
+    {
+      "scene_id": "scene_9",
+      "voice_text": "Phân tích lý do tại sao Cung Điện Hữu Ninh lại trở thành một trong những bí ẩn lớn của Trung Quốc, có thể là vì lịch sử xây dựng phức tạp, sự kết hợp giữa văn hóa và truyền thuyết, và những hiện tượng không thể giải thích.",
+      "visual_prompt": "A cinematic painting of the Forbidden City at dusk, highlighting its ancient architecture and serene atmosphere. The scene should capture the grandeur of the palace with a focus on traditional Chinese elements like upturned eaves and intricate carvings.",
+      "effect": {
+        "type": "static",
+        "speed": 0.001
+      },
+      "chart_data": null,
+      "chapter_id": "chapter_3",
+      "chapter_title": "Bí Ẩn Số 2: Quảng Trường Thiên An Môn - Lịch Sử và Câu Chuyện Bất Cẩn",
+      "background_music": "src/mock_assets/music_upbeat.wav",
+      "music_theme": "upbeat"
+    },
+    {
+      "scene_id": "scene_10",
+      "voice_text": "Quảng trường Thiên An Môn, một trong những trung tâm chính trị quan trọng nhất của Trung Quốc, từng là nơi diễn ra nhiều sự kiện lịch sử lớn.",
+      "visual_prompt": "A detailed cinematic painting of Tiananmen Square with a focus on its historical significance. The scene should depict the square during a significant moment in history, such as a parade or protest, capturing the grandeur and political importance of the location.",
+      "effect": {
+        "type": "zoom_in",
+        "speed": 0.001
+      },
+      "chart_data": null,
+      "chapter_id": "chapter_3",
+      "chapter_title": "Bí Ẩn Số 2: Quảng Trường Thiên An Môn - Lịch Sử và Câu Chuyện Bất Cẩn",
+      "background_music": "src/mock_assets/music_upbeat.wav",
+      "music_theme": "upbeat"
+    },
+    {
+      "scene_id": "scene_11",
+      "voice_text": "Một câu chuyện bất cẩn nổi tiếng tại Quảng trường Thiên An Môn là sự kiện vào ngày 15 tháng 6 năm 1989, khi một chiếc xe tăng của quân đội Trung Quốc đụng chạm vào một người dân bình thường. Điều này đã trở thành một trong những hiện tượng không thể giải thích và gây sốc cho cả thế giới.",
+      "visual_prompt": "A dramatic cinematic painting of the moment a tank collided with a civilian in Tiananmen Square on June 15, 1989. The scene should capture the tension and emotion of the moment, focusing on the interaction between the tank and the civilian.",
       "effect": {
         "type": "zoom_out",
-        "speed": 0.0012
-      }
+        "speed": 0.001
+      },
+      "chart_data": null,
+      "chapter_id": "chapter_3",
+      "chapter_title": "Bí Ẩn Số 2: Quảng Trường Thiên An Môn - Lịch Sử và Câu Chuyện Bất Cẩn",
+      "background_music": "src/mock_assets/music_upbeat.wav",
+      "music_theme": "upbeat"
+    },
+    {
+      "scene_id": "scene_12",
+      "voice_text": "Câu chuyện này không chỉ là một sự kiện bất cẩn mà còn gợi lên những truyền thuyết và bí mật xung quanh Quảng trường Thiên An Môn. Nhiều người tin rằng nơi này là tâm điểm của nhiều hiện tượng kỳ lạ.",
+      "visual_prompt": "A mystical cinematic painting of Tiananmen Square at night, surrounded by an eerie ambiance and legends. The scene should include subtle elements like glowing lights, shadowy figures, and ancient Chinese symbols to create a sense of mystery.",
+      "effect": {
+        "type": "static",
+        "speed": 0.001
+      },
+      "chart_data": null,
+      "chapter_id": "chapter_3",
+      "chapter_title": "Bí Ẩn Số 2: Quảng Trường Thiên An Môn - Lịch Sử và Câu Chuyện Bất Cẩn",
+      "background_music": "src/mock_assets/music_upbeat.wav",
+      "music_theme": "upbeat"
+    },
+    {
+      "scene_id": "scene_13",
+      "voice_text": "Câu chuyện này không chỉ là một sự kiện bất cẩn mà còn gợi lên những truyền thuyết và bí mật xung quanh Quảng trường Thiên An Môn. Nhiều người tin rằng nơi này là tâm điểm của nhiều hiện tượng kỳ lạ.",
+      "visual_prompt": "A cinematic painting of Tienanmen Square at night, with a mysterious aura and ancient Chinese lanterns hanging overhead. The camera focuses on the iconic Gate of Heavenly Peace, surrounded by an ethereal glow and distant crowd.",
+      "effect": {
+        "type": "static",
+        "speed": 0.1
+      },
+      "chart_data": null,
+      "chapter_id": "chapter_4",
+      "chapter_title": "Kết Luận: Bí Ẩn và Lịch Sử - Tầm Quan Trọng của Việc Khám Phá",
+      "background_music": "src/mock_assets/music_mysterious.wav",
+      "music_theme": "mysterious"
+    },
+    {
+      "scene_id": "scene_14",
+      "voice_text": "Một trong những bí ẩn lớn nhất xung quanh Quảng trường Thiên An Môn là hiện tượng ánh sáng kỳ lạ xuất hiện vào ban đêm. Nhiều người cho rằng đó là dấu hiệu của sự bất hảo hoặc một lực lượng siêu nhiên.",
+      "visual_prompt": "A detailed cinematic painting showing the phenomenon of mysterious lights over Tienanmen Square at night, with a crowd of onlookers in the foreground, witnessing the event with expressions of awe and fear. The lights are depicted as ethereal and otherworldly.",
+      "effect": {
+        "type": "zoom_in",
+        "speed": 0.001
+      },
+      "chart_data": null,
+      "chapter_id": "chapter_4",
+      "chapter_title": "Kết Luận: Bí Ẩn và Lịch Sử - Tầm Quan Trọng của Việc Khám Phá",
+      "background_music": "src/mock_assets/music_mysterious.wav",
+      "music_theme": "mysterious"
+    },
+    {
+      "scene_id": "scene_15",
+      "voice_text": "Đến với bí ẩn của hang động Đongdiao, một trong những hang động huyền bí nhất ở Trung Quốc, nơi mà nhiều người tin rằng có sự hiện diện của các linh hồn và thế lực bí ẩn.",
+      "visual_prompt": "A cinematic painting of the Dongdiao Caves in China, with ancient carvings and mysterious symbols on the cave walls. The camera focuses on a deep, dark cave entrance, with a faint light shining from within.",
+      "effect": {
+        "type": "static",
+        "speed": 0.1
+      },
+      "chart_data": null,
+      "chapter_id": "chapter_4",
+      "chapter_title": "Kết Luận: Bí Ẩn và Lịch Sử - Tầm Quan Trọng của Việc Khám Phá",
+      "background_music": "src/mock_assets/music_mysterious.wav",
+      "music_theme": "mysterious"
+    },
+    {
+      "scene_id": "scene_16",
+      "voice_text": "Bí ẩn của núi Phụng Hoàng, nơi mà truyền thuyết kể rằng có một cổ vật vô giá được giấu kín dưới lòng đất. Nhiều người đã tìm kiếm nó trong hàng thế kỷ, nhưng vẫn không ai thành công.",
+      "visual_prompt": "A cinematic painting of the Fenghuang Mountain in China, with a mystical aura and ancient ruins at the summit. The camera pans over the mountain range, highlighting the rugged terrain and hidden structures.",
+      "effect": {
+        "type": "zoom_out",
+        "speed": 0.001
+      },
+      "chart_data": null,
+      "chapter_id": "chapter_4",
+      "chapter_title": "Kết Luận: Bí Ẩn và Lịch Sử - Tầm Quan Trọng của Việc Khám Phá",
+      "background_music": "src/mock_assets/music_mysterious.wav",
+      "music_theme": "mysterious"
+    },
+    {
+      "scene_id": "scene_17",
+      "voice_text": "Những bí ẩn này không chỉ là những câu chuyện truyền miệng mà còn gợi lên tầm quan trọng của việc khám phá và hiểu biết trong lịch sử và văn hóa Trung Quốc. Hãy cùng nhau tìm hiểu thêm về các bí ẩn khác trên thế giới.",
+      "visual_prompt": "A cinematic painting of a global map, with a focus on China and its iconic landmarks. The map is surrounded by books, scrolls, and artifacts representing the history and culture of China.",
+      "effect": {
+        "type": "static",
+        "speed": 0.1
+      },
+      "chart_data": null,
+      "chapter_id": "chapter_4",
+      "chapter_title": "Kết Luận: Bí Ẩn và Lịch Sử - Tầm Quan Trọng của Việc Khám Phá",
+      "background_music": "src/mock_assets/music_mysterious.wav",
+      "music_theme": "mysterious"
     }
-  ]
+  ],
+  "background_music": "src/mock_assets/music.wav",
+  "music_volume": 0.06
 }

@@ -1,8 +1,10 @@
 import os
+import sys
 import json
 import subprocess
 import imageio_ffmpeg
 import re
+import time
 from .subtitle_gen import generate_ass
 from .voice_gen import generate_voice_and_subtitles
 from .image_gen import generate_image
@@ -30,12 +32,22 @@ def render_scene_clip(ffmpeg_exe, image_path, voice_path, ass_path, duration, ef
     effect_type = effect.get("type", "static")
     speed = effect.get("speed", 0.001)
     
+    # Calculate safe threads to prevent 100% CPU lockup
+    cpu_count = os.cpu_count() or 4
+    ffmpeg_threads = str(max(1, min(4, cpu_count - 1)))
+    
+    # Lower priority class on Windows to keep system responsive
+    creationflags = 0
+    if sys.platform == "win32":
+        creationflags = 0x00004000  # BELOW_NORMAL_PRIORITY_CLASS
+    
+    # Optimize zoompan to run at 960x540 instead of 1920x1080 (reduces pixels by 4x for zoompan filter), then scale to 1920x1080
     if effect_type == "zoom_in":
         z_expr = f"zoom+{speed}"
-        zoompan_filter = f"zoompan=z='{z_expr}':d={num_frames}:s=1920x1080:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':fps={fps}"
+        zoompan_filter = f"zoompan=z='{z_expr}':d={num_frames}:s=960x540:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':fps={fps},scale=1920:1080"
     elif effect_type == "zoom_out":
         z_expr = f"if(eq(on,1),1.15,zoom-{speed})"
-        zoompan_filter = f"zoompan=z='{z_expr}':d={num_frames}:s=1920x1080:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':fps={fps}"
+        zoompan_filter = f"zoompan=z='{z_expr}':d={num_frames}:s=960x540:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':fps={fps},scale=1920:1080"
     else:
         zoompan_filter = "scale=1920:1080"
         
@@ -51,6 +63,7 @@ def render_scene_clip(ffmpeg_exe, image_path, voice_path, ass_path, duration, ef
         audio_filter = "[1:a][2:a]amix=inputs=2:duration=first[a]"
         cmd = [
             ffmpeg_exe, "-y",
+            "-threads", ffmpeg_threads,
             "-loop", "1", "-i", image_path,
             "-i", voice_path,
             "-i", whoosh_path,
@@ -58,6 +71,7 @@ def render_scene_clip(ffmpeg_exe, image_path, voice_path, ass_path, duration, ef
             "-map", "[v]",
             "-map", "[a]",
             "-c:v", "libx264",
+            "-preset", "faster",
             "-tune", "stillimage",
             "-c:a", "aac",
             "-b:a", "192k",
@@ -68,12 +82,14 @@ def render_scene_clip(ffmpeg_exe, image_path, voice_path, ass_path, duration, ef
     else:
         cmd = [
             ffmpeg_exe, "-y",
+            "-threads", ffmpeg_threads,
             "-loop", "1", "-i", image_path,
             "-i", voice_path,
             "-filter_complex", filter_str,
             "-map", "[v]",
             "-map", "1:a",
             "-c:v", "libx264",
+            "-preset", "faster",
             "-tune", "stillimage",
             "-c:a", "aac",
             "-b:a", "192k",
@@ -83,7 +99,7 @@ def render_scene_clip(ffmpeg_exe, image_path, voice_path, ass_path, duration, ef
         ]
     
     print(f"Rendering scene clip: {output_clip_path} (effect: {effect_type}, whoosh: {use_whoosh}, duration: {duration:.2f}s)...")
-    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, creationflags=creationflags)
     if result.returncode != 0:
         print(f"[Error] Rendering scene clip {output_clip_path}!")
         print(result.stderr)
@@ -106,8 +122,12 @@ def concat_clips(ffmpeg_exe, clip_paths, output_path):
         output_path
     ]
     
+    creationflags = 0
+    if sys.platform == "win32":
+        creationflags = 0x00004000  # BELOW_NORMAL_PRIORITY_CLASS
+        
     print("Concatenating scenes into a unified video...")
-    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, creationflags=creationflags)
     
     if os.path.exists(list_file_path):
         os.remove(list_file_path)
@@ -132,14 +152,18 @@ def mix_background_music(ffmpeg_exe, video_path, music_path, music_volume, outpu
         output_path
     ]
     
+    creationflags = 0
+    if sys.platform == "win32":
+        creationflags = 0x00004000  # BELOW_NORMAL_PRIORITY_CLASS
+        
     print(f"Mixing background music (volume: {music_volume})...")
-    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, creationflags=creationflags)
     if result.returncode != 0:
         print("[Error] Mixing background music!")
         print(result.stderr)
         raise RuntimeError(f"FFmpeg mix audio error: {result.stderr}")
 
-def compose_video(timeline_path, final_output_path):
+def compose_video(timeline_path, final_output_path, progress_callback=None):
     """Core function to orchestrate the video composition process."""
     ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
     
@@ -157,13 +181,24 @@ def compose_video(timeline_path, final_output_path):
     voice_code = timeline.get("voice_code", "vi-VN-HoaiMyNeural")
     visual_style = timeline.get("visual_style", "cinematic painting")
     
-    clip_paths = []
+    scenes = timeline.get("scenes", [])
+    total_scenes = len(scenes)
+    
+    # Kiểm tra xem có chứa chương (chapters) hay không
+    has_chapters = any("chapter_id" in scene for scene in scenes)
+    
+    clip_paths = {}
     temp_files = [] # Chỉ chứa các file trung gian thực sự cần xóa
     
     try:
-        for i, scene in enumerate(timeline["scenes"]):
+        # 1. Sinh voice/ảnh và render clip cho từng phân cảnh (Scene Clips)
+        for i, scene in enumerate(scenes):
             scene_id = scene["scene_id"]
             
+            if progress_callback:
+                percent = int((i / total_scenes) * 80)
+                progress_callback(percent, f"Đang dựng phân cảnh {i+1}/{total_scenes}: {scene_id}")
+                
             # Đường dẫn tệp tin âm thanh giọng nói và hình ảnh (Lưu trữ lâu dài)
             voice_path = f"src/mock_assets/{project_slug}_{scene_id}_voice.mp3"
             image_path = scene.get("visual_asset_path")
@@ -172,7 +207,7 @@ def compose_video(timeline_path, final_output_path):
             ass_path = f"temp/{scene_id}.ass"
             clip_path = f"temp/{scene_id}.mp4"
             
-            # 1. Sinh giọng nói và mốc thời gian động (nếu chưa có file âm thanh)
+            # Sinh giọng nói và mốc thời gian động (nếu chưa có file âm thanh)
             if not os.path.exists(voice_path):
                 print(f"Generating TTS audio for scene {scene_id} using voice {voice_code}...")
                 subs_list = generate_voice_and_subtitles(scene["voice_text"], voice_code, voice_path)
@@ -189,7 +224,7 @@ def compose_video(timeline_path, final_output_path):
             scene["voice_audio_path"] = voice_path
             scene["subtitles"] = subs_list
             
-            # 2. Xử lý ảnh phân cảnh: Kiểm tra xem có chứa ChartData hay không
+            # Xử lý ảnh phân cảnh: Kiểm tra xem có chứa ChartData hay không
             chart_data = scene.get("chart_data")
             if chart_data:
                 # Nếu có dữ liệu biểu đồ, tự động sinh ảnh biểu đồ Matplotlib làm ảnh nền
@@ -204,11 +239,11 @@ def compose_video(timeline_path, final_output_path):
                 
             scene["visual_asset_path"] = image_path
             
-            # 3. Tạo phụ đề ASS tạm
+            # Tạo phụ đề ASS tạm
             generate_ass(subs_list, ass_path)
             temp_files.append(ass_path)
             
-            # 4. Render clip cho scene này (chèn whoosh từ scene thứ 2 trở đi)
+            # Render clip cho scene này (chèn whoosh từ scene thứ 2 trở đi)
             render_scene_clip(
                 ffmpeg_exe=ffmpeg_exe,
                 image_path=image_path,
@@ -219,32 +254,87 @@ def compose_video(timeline_path, final_output_path):
                 output_clip_path=clip_path,
                 use_whoosh=(i > 0)
             )
-            clip_paths.append(clip_path)
+            clip_paths[scene_id] = clip_path
             temp_files.append(clip_path)
             
-        # 5. Ghép nối toàn bộ phân cảnh
-        concatenated_path = "temp/concatenated_no_music.mp4"
-        temp_files.append(concatenated_path)
-        concat_clips(ffmpeg_exe, clip_paths, concatenated_path)
-        
-        # 6. Trộn nhạc nền
-        bg_music = timeline.get("background_music")
-        if bg_music and os.path.exists(bg_music):
-            music_volume = timeline.get("music_volume", 0.1)
-            mix_background_music(
-                ffmpeg_exe=ffmpeg_exe,
-                video_path=concatenated_path,
-                music_path=bg_music,
-                music_volume=music_volume,
-                output_path=final_output_path
-            )
+            # Cooldown sleep to prevent system overheating (especially on laptops)
+            time.sleep(1.5)
+            
+        # 2. Ghép nối và lồng nhạc nền
+        if progress_callback:
+            progress_callback(85, "Đang tiến hành ghép các phân cảnh và lồng nhạc nền...")
+            
+        if has_chapters:
+            # Nhóm các phân cảnh theo từng chương
+            chapters_order = []
+            chapter_scenes = {}
+            for scene in scenes:
+                ch_id = scene.get("chapter_id", "general")
+                if ch_id not in chapter_scenes:
+                    chapters_order.append(ch_id)
+                    chapter_scenes[ch_id] = []
+                chapter_scenes[ch_id].append(scene)
+                
+            chapter_clips = []
+            for ch_idx, ch_id in enumerate(chapters_order):
+                ch_s_list = chapter_scenes[ch_id]
+                ch_clip_paths = [clip_paths[s["scene_id"]] for s in ch_s_list]
+                
+                ch_unmixed = f"temp/chapter_{ch_id}_unmixed.mp4"
+                ch_mixed = f"temp/chapter_{ch_id}_mixed.mp4"
+                temp_files.extend([ch_unmixed, ch_mixed])
+                
+                # Ghép nối các phân cảnh của chương này
+                print(f"Assembling scenes for chapter {ch_id}...")
+                concat_clips(ffmpeg_exe, ch_clip_paths, ch_unmixed)
+                
+                # Lồng nhạc nền riêng cho chương này
+                bg_music = ch_s_list[0].get("background_music")
+                if bg_music and os.path.exists(bg_music):
+                    music_volume = timeline.get("music_volume", 0.06)
+                    mix_background_music(
+                        ffmpeg_exe=ffmpeg_exe,
+                        video_path=ch_unmixed,
+                        music_path=bg_music,
+                        music_volume=music_volume,
+                        output_path=ch_mixed
+                    )
+                else:
+                    shutil.copy(ch_unmixed, ch_mixed)
+                chapter_clips.append(ch_mixed)
+                
+            # Ghép nối tất cả các chương thành video hoàn chỉnh
+            print("Assembling chapters into final video...")
+            concat_clips(ffmpeg_exe, chapter_clips, final_output_path)
         else:
-            print("No background music detected. Exporting direct video copy...")
-            subprocess.run([ffmpeg_exe, "-y", "-i", concatenated_path, "-c", "copy", final_output_path])
+            # Luồng ghép truyền thống (ghép toàn bộ rồi lồng 1 file nhạc nền duy nhất)
+            concatenated_path = "temp/concatenated_no_music.mp4"
+            temp_files.append(concatenated_path)
+            concat_clips(ffmpeg_exe, list(clip_paths.values()), concatenated_path)
+            
+            bg_music = timeline.get("background_music")
+            if bg_music and os.path.exists(bg_music):
+                music_volume = timeline.get("music_volume", 0.06)
+                mix_background_music(
+                    ffmpeg_exe=ffmpeg_exe,
+                    video_path=concatenated_path,
+                    music_path=bg_music,
+                    music_volume=music_volume,
+                    output_path=final_output_path
+                )
+            else:
+                print("No background music detected. Exporting direct video copy...")
+                creationflags = 0
+                if sys.platform == "win32":
+                    creationflags = 0x00004000
+                subprocess.run([ffmpeg_exe, "-y", "-i", concatenated_path, "-c", "copy", final_output_path], creationflags=creationflags)
+                
+        if progress_callback:
+            progress_callback(100, "Hoàn tất dựng video!")
             
         print(f"\nVideo composed successfully! Output file: {final_output_path}")
         
-        # Ghi đè lại file timeline_example.json để cập nhật đường dẫn chính xác đã sinh
+        # Ghi đè lại file timeline để cập nhật đường dẫn chính xác đã sinh
         with open(timeline_path, 'w', encoding='utf-8') as f:
             json.dump(timeline, f, indent=2, ensure_ascii=False)
             

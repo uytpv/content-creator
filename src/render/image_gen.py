@@ -66,8 +66,8 @@ def generate_image(prompt, style_preset, output_path):
         "prompt": full_prompt,
         "negative_prompt": negative_prompt,
         "steps": 20,
-        "width": 1920,
-        "height": 1080,
+        "width": 960,
+        "height": 540,
         "cfg_scale": 7.0,
         "sampler_name": "Euler a"
     }
@@ -76,8 +76,8 @@ def generate_image(prompt, style_preset, output_path):
     
     print(f"Requesting SD image from Local GPU API ({SD_API_URL})...")
     try:
-        # Đặt timeout ngắn (3.5 giây) để không làm treo hệ thống nếu máy GPU kia không hoạt động
-        response = requests.post(api_endpoint, json=payload, timeout=3.5)
+        # Tăng timeout lên 30 giây vì sinh ảnh trên RTX 3060 Laptop thường mất 5-15s
+        response = requests.post(api_endpoint, json=payload, timeout=30.0)
         
         if response.status_code == 200:
             data = response.json()
